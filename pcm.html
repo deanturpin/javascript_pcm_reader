@@ -11,7 +11,9 @@ onload = function() {
     const file = e.target.files[0];
     const reader = new FileReader(file);
 
-    console.log("file size", file.size);
+    const status = document.getElementById("status");
+
+    status.innerText = "File size" + file.size + "\n\n";
 
     // Read WAV header
     var start = 0;
@@ -22,17 +24,15 @@ onload = function() {
 
     reader.onload = function(e) {
 
-      const status = document.getElementById("status");
-
       // Read a block of samples
       reader.onload = function(e) {
 
-        console.log("get samples");
         const samples = new Int16Array(e.target.result);
 
-        for (var i in samples) {
+        for (var i = 0; i < samples.length; i += 1) {
 
-          const s = (16384 + samples[i]);
+          // const s = (samples[i + 1] << 8) & samples[i];
+          const s = 0x7fff + ~(samples[i] - 1);
           status.innerText += i + ": " + s + "\n";
         }
       }
@@ -41,17 +41,6 @@ onload = function() {
       end = start + block;
       reader.readAsArrayBuffer(file.slice(start, end));
       start += block;
-
-      // setTimeout(function(){
-
-      //   status.innerText = new Date();
-
-      //   var start = 0;
-      //   var end = start + 44;
-      //   reader.readAsArrayBuffer(file.slice(start, end));
-      //   start += 44;
-
-      // }, 100);
     }
   }
 }
