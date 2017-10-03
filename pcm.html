@@ -10,36 +10,22 @@ onload = function() {
 
     const file = e.target.files[0];
     const reader = new FileReader(file);
-    const length = 8;
 
-    var offset = 0;
+    console.log("file size", file.size);
 
-    readEventHandler = function(evt) {
+    // Fetch header
+    var start = 0;
+    var end = 44;
+    reader.readAsArrayBuffer(file.slice(start, end));
 
-      const pcm = new Uint16Array(evt.target.result);
-      console.log("size of file", evt.target.result);
-      console.log("samples", pcm.length);
-      offset += pcm.length;
+    reader.onload = function(e) {
 
-      for (var i in pcm)
-        document.getElementById("status").innerText += i + ": " + pcm[i] + ", ";
+      const header = new Uint8Array(e.target.result);
+      const status = document.getElementById("status");
 
-      document.getElementById("status").innerText += "\n";
-
-      if (offset >= file.size)
-        return;
-
-      readBlock();
+      for (var i in header)
+        status.innerText += i + ": " + header[i].toString(16) + "\n";
     }
-
-    readBlock = function() {
-
-      var r = new FileReader();
-      r.onload = readEventHandler;
-      r.readAsArrayBuffer(file.slice(offset, length + offset));
-    }
-
-    readBlock();
   }
 }
 </script>
