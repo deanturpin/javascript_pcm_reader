@@ -13,18 +13,45 @@ onload = function() {
 
     console.log("file size", file.size);
 
-    // Fetch header
+    // Read WAV header
     var start = 0;
-    var end = 44;
+    const headerSize = 44;
+    var end = start + headerSize;
     reader.readAsArrayBuffer(file.slice(start, end));
+    start += headerSize + 2;
 
     reader.onload = function(e) {
 
-      const header = new Uint8Array(e.target.result);
       const status = document.getElementById("status");
 
-      for (var i in header)
-        status.innerText += i + ": " + header[i].toString(16) + "\n";
+      // Read a block of samples
+      reader.onload = function(e) {
+
+        console.log("get samples");
+        const samples = new Int16Array(e.target.result);
+
+        for (var i in samples) {
+
+          const s = (16384 + samples[i]);
+          status.innerText += i + ": " + s + "\n";
+        }
+      }
+
+      const block = 64;
+      end = start + block;
+      reader.readAsArrayBuffer(file.slice(start, end));
+      start += block;
+
+      // setTimeout(function(){
+
+      //   status.innerText = new Date();
+
+      //   var start = 0;
+      //   var end = start + 44;
+      //   reader.readAsArrayBuffer(file.slice(start, end));
+      //   start += 44;
+
+      // }, 100);
     }
   }
 }
