@@ -1,19 +1,45 @@
-<input type="file" id="pcm" accept="*.pcm" />
+<input type="file" id="pcm" /><br>
+<p id="status"></p>
 
 <script>
+"use strict;"
+
 onload = function() {
 
   document.getElementById("pcm").onchange = function(e) {
 
-    const reader = new FileReader(e.target.files[0]);
-    reader.readAsArrayBuffer(e.target.files[0]);
+    const file = e.target.files[0];
+    const reader = new FileReader(file);
+    const length = 8;
 
-    // Set up handler for pulse file read
-    reader.onload = function(e) {
+    var offset = 0;
 
-      const pcm = new Uint16Array(e.target.result);
-      console.log("size of file", pcm.length);
+    readEventHandler = function(evt) {
+
+      const pcm = new Uint16Array(evt.target.result);
+      console.log("size of file", evt.target.result);
+      console.log("samples", pcm.length);
+      offset += pcm.length;
+
+      for (var i in pcm)
+        document.getElementById("status").innerText += i + ": " + pcm[i] + ", ";
+
+      document.getElementById("status").innerText += "\n";
+
+      if (offset >= file.size)
+        return;
+
+      readBlock();
     }
+
+    readBlock = function() {
+
+      var r = new FileReader();
+      r.onload = readEventHandler;
+      r.readAsArrayBuffer(file.slice(offset, length + offset));
+    }
+
+    readBlock();
   }
 }
 </script>
