@@ -6,6 +6,20 @@
 
 onload = function() {
 
+
+  // Create a canvas element
+  const canvas = document.createElement("canvas");
+  const body = document.getElementsByTagName("body")[0];
+
+  // Add it to the DOM
+  body.appendChild(canvas);
+  const context = canvas.getContext("2d");
+
+  // Set canvas size
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  // Create file open handler
   document.getElementById("pcm").onchange = function(e) {
 
     const file = e.target.files[0];
@@ -13,7 +27,7 @@ onload = function() {
 
     const status = document.getElementById("status");
 
-    status.innerText = "File size" + file.size + "\n\n";
+    status.innerText = "File size " + file.size + "\n\n";
 
     // Read WAV header
     var start = 0;
@@ -31,13 +45,12 @@ onload = function() {
 
         for (var i = 0; i < samples.length; i += 1) {
 
-          // const s = (samples[i + 1] << 8) & samples[i];
-          const s = 0x7fff + ~(samples[i] - 1);
-          status.innerText += i + ": " + s + "\n";
+          const s = ~(samples[i] - 1) / 128;
+          context.fillRect(i, s + canvas.height / 2, 2, 2);
         }
       }
 
-      const block = 64;
+      const block = 2 * 1200;
       end = start + block;
       reader.readAsArrayBuffer(file.slice(start, end));
       start += block;
