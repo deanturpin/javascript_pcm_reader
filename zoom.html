@@ -18,16 +18,33 @@ onload = function() {
   var i = 0;
   context.fillStyle = "black";
 
+  canvas.onmousedown = function() {
+
+    console.log("mousedown - " + new Date);
+  }
+
+  // get mouse positino
+
+  canvas.oncontextmenu = function() {
+
+    console.log("right click");
+
+    return false;
+  }
+
+  let direction = .05;
   setInterval(function() {
 
               // console.log(i);
               context.clearRect(0, 0, width, height);
               context.fillRect(i * width, i * height, 5, 5);
 
-              i += .01;
+              i += direction;
 
-              if (i >= 1)
-              i = 0;
+              if (i >= 1 || i <= 0) {
+                direction = -direction;
+                i += 2 * direction;
+              }
 
               }, 100);
 }
